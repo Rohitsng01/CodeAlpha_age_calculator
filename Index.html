@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Age Calculator</title>
+  <style>
+    /* Background animation */
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(-45deg, #ff00cc, #3333ff, #00ffcc, #ffcc00);
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Glassmorphism container */
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      color: #fff;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      background: linear-gradient(90deg, #ff00cc, #00ffcc, #ffcc00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: #ffccff;
+    }
+
+    input[type="date"] {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      text-align: center;
+      background: rgba(0,0,0,0.6);
+      color: #00ffe5;
+      outline: none;
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #ff00cc, #ffcc00, #00ffcc);
+      background-size: 300% 300%;
+      color: black;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: buttonGlow 3s infinite alternate;
+    }
+
+    @keyframes buttonGlow {
+      0% { box-shadow: 0 0 10px #ff00cc; }
+      50% { box-shadow: 0 0 20px #00ffcc; }
+      100% { box-shadow: 0 0 25px #ffcc00; }
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #00ffcc;
+      text-shadow: 0 0 8px #ff00cc;
+    }
+
+    .error {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #ff5555;
+    }
+
+    /* Floating emojis (for craziness 😎) */
+    .emoji {
+      position: absolute;
+      font-size: 28px;
+      animation: float 6s infinite ease-in-out;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-25px); }
+      100% { transform: translateY(0); }
+    }
+
+    .emoji:nth-child(1) { top: 10%; left: 10%; }
+    .emoji:nth-child(2) { bottom: 15%; left: 5%; }
+    .emoji:nth-child(3) { top: 25%; right: 10%; }
+    .emoji:nth-child(4) { bottom: 10%; right: 15%; }
+
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="emoji">🎉</div>
+  <div class="emoji">✨</div>
+  <div class="emoji">💥</div>
+  <div class="emoji">🎂</div>
+
+  <div class="card">
+    <h1>Crazy Age Calculator</h1>
+    <label for="dob">Pick your Date of Birth:</label>
+    <input type="date" id="dob">
+    <button onclick="calcAge()">Find My Age 🚀</button>
+    <div id="output" class="result"></div>
+    <div id="warning" class="error"></div>
+  </div>
+
+  <script>
+    function calcAge() {
+      const dobVal = document.getElementById("dob").value;
+      const out = document.getElementById("output");
+      const warn = document.getElementById("warning");
+
+      out.textContent = "";
+      warn.textContent = "";
+
+      if (!dobVal) {
+        warn.textContent = "⚠️ Please select a valid date.";
+        return;
+      }
+
+      const dob = new Date(dobVal);
+      const today = new Date();
+
+      if (dob > today) {
+        warn.textContent = "⚠️ Date of birth cannot be in the future.";
+        return;
+      }
+
+      let years = today.getFullYear() - dob.getFullYear();
+      let months = today.getMonth() - dob.getMonth();
+      let days = today.getDate() - dob.getDate();
+
+      if (days < 0) {
+        months--;
+        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += lastMonth.getDate();
+      }
+
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      out.textContent = `🎂 You are ${years} years, ${months} months, and ${days} days old! 🎉`;
+    }
+  </script>
+</body>
+</html>
