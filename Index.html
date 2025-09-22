@@ -5,180 +5,174 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Age Calculator</title>
   <style>
-    /* Background animation */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad390, #6a82fb, #fc5c7d);
+      --container-bg: rgba(0, 0, 0, 0.75);
+      --text-color: #fff;
+      --accent: #00ffcc;
+      --error: #ff6b6b;
+      --btn-bg: linear-gradient(135deg, #ff6ec4, #7873f5);
+      --btn-bg-hover: linear-gradient(135deg, #ff3aa0, #6a82fb);
+    }
+
+    body.light {
+      --bg-gradient: linear-gradient(135deg, #a1c4fd, #c2e9fb, #fbc2eb, #a6c1ee);
+      --container-bg: rgba(255, 255, 255, 0.9);
+      --text-color: #222;
+      --accent: #007bff;
+      --error: #d9534f;
+      --btn-bg: linear-gradient(135deg, #36d1dc, #5b86e5);
+      --btn-bg-hover: linear-gradient(135deg, #2980b9, #6dd5fa);
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(-45deg, #ff00cc, #3333ff, #00ffcc, #ffcc00);
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
       background-size: 400% 400%;
-      animation: gradientMove 12s ease infinite;
+      animation: gradient 12s ease infinite;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
       padding: 15px;
+      color: var(--text-color);
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
 
-    /* Glassmorphism container */
-    .card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 30px;
+    .container {
+      background: var(--container-bg);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 400px;
       width: 100%;
-      max-width: 420px;
       text-align: center;
-      color: #fff;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.2);
-      animation: fadeIn 1s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      transition: background 0.4s ease;
     }
 
     h1 {
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
       margin-bottom: 20px;
-      font-size: 1.6rem;
-      background: linear-gradient(90deg, #ff00cc, #00ffcc, #ffcc00);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
     label {
       display: block;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-weight: bold;
-      font-size: 0.95rem;
-      color: #ffccff;
     }
 
     input[type="date"] {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       border: none;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      font-size: 1rem;
+      border-radius: 8px;
+      margin-bottom: 15px;
       text-align: center;
-      background: rgba(0,0,0,0.6);
-      color: #00ffe5;
-      outline: none;
-      box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+      font-size: 1rem;
+      background: #222;
+      color: var(--accent);
+    }
+
+    body.light input[type="date"] {
+      background: #f2f2f2;
+      color: #333;
     }
 
     button {
       width: 100%;
       padding: 12px;
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(45deg, #ff00cc, #ffcc00, #00ffcc);
-      background-size: 300% 300%;
-      color: black;
-      font-weight: bold;
+      border-radius: 8px;
+      background: var(--btn-bg);
+      color: white;
       font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      animation: buttonGlow 3s infinite alternate;
-    }
-
-    @keyframes buttonGlow {
-      0% { box-shadow: 0 0 10px #ff00cc; }
-      50% { box-shadow: 0 0 20px #00ffcc; }
-      100% { box-shadow: 0 0 25px #ffcc00; }
+      transition: 0.3s ease;
     }
 
     button:hover {
       transform: scale(1.05);
+      background: var(--btn-bg-hover);
+    }
+
+    .toggle-btn {
+      margin-top: 15px;
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      font-size: 0.9rem;
     }
 
     .result {
       margin-top: 20px;
       font-size: 1rem;
       font-weight: bold;
-      color: #00ffcc;
-      text-shadow: 0 0 8px #ff00cc;
+      color: var(--accent);
     }
 
     .error {
       margin-top: 15px;
       font-size: 0.9rem;
-      color: #ff5555;
+      color: var(--error);
     }
 
-    /* Floating emojis (for craziness 😎) */
-    .emoji {
-      position: absolute;
-      font-size: 28px;
-      animation: float 6s infinite ease-in-out;
-      opacity: 0.8;
-      pointer-events: none;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-25px); }
-      100% { transform: translateY(0); }
-    }
-
-    .emoji:nth-child(1) { top: 10%; left: 10%; }
-    .emoji:nth-child(2) { bottom: 15%; left: 5%; }
-    .emoji:nth-child(3) { top: 25%; right: 10%; }
-    .emoji:nth-child(4) { bottom: 10%; right: 15%; }
-
-    /* Responsive tweaks */
     @media (max-width: 480px) {
-      .card {
-        padding: 20px;
-      }
       h1 {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
+      }
+      .container {
+        padding: 20px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="emoji">🎉</div>
-  <div class="emoji">✨</div>
-  <div class="emoji">💥</div>
-  <div class="emoji">🎂</div>
+  <div class="container">
+    <h1>🎂 Age Calculator</h1>
+    <p class="subtitle">Find your exact age in years, months & days</p>
 
-  <div class="card">
-    <h1>Crazy Age Calculator</h1>
-    <label for="dob">Pick your Date of Birth:</label>
+    <label for="dob">Select your Date of Birth:</label>
     <input type="date" id="dob">
-    <button onclick="calcAge()">Find My Age 🚀</button>
-    <div id="output" class="result"></div>
-    <div id="warning" class="error"></div>
+
+    <button onclick="calculateAge()">Calculate Age</button>
+    <button class="toggle-btn" onclick="toggleMode()">🌙 Toggle Dark/Light</button>
+
+    <div id="result" class="result"></div>
+    <div id="error" class="error"></div>
   </div>
 
   <script>
-    function calcAge() {
-      const dobVal = document.getElementById("dob").value;
-      const out = document.getElementById("output");
-      const warn = document.getElementById("warning");
+    function calculateAge() {
+      const dobInput = document.getElementById("dob").value;
+      const result = document.getElementById("result");
+      const error = document.getElementById("error");
 
-      out.textContent = "";
-      warn.textContent = "";
+      result.textContent = "";
+      error.textContent = "";
 
-      if (!dobVal) {
-        warn.textContent = "⚠️ Please select a valid date.";
+      if (!dobInput) {
+        error.textContent = "⚠️ Please select your date of birth.";
         return;
       }
 
-      const dob = new Date(dobVal);
+      const dob = new Date(dobInput);
       const today = new Date();
 
       if (dob > today) {
-        warn.textContent = "⚠️ Date of birth cannot be in the future.";
+        error.textContent = "⚠️ Birth date cannot be in the future!";
         return;
       }
 
@@ -188,8 +182,8 @@
 
       if (days < 0) {
         months--;
-        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-        days += lastMonth.getDate();
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
       }
 
       if (months < 0) {
@@ -197,7 +191,11 @@
         months += 12;
       }
 
-      out.textContent = `🎂 You are ${years} years, ${months} months, and ${days} days old! 🎉`;
+      result.textContent = `🎉 You are ${years} years, ${months} months, and ${days} days old!`;
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle("light");
     }
   </script>
 </body>
