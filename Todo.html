@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    :root {
+      --bg: #f4f4f9;
+      --text: #222;
+      --card: #fff;
+      --primary: #4cafef;
+      --success: #4caf50;
+      --danger: #e74c3c;
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #eee;
+      --card: #1e1e1e;
+      --primary: #4cafef;
+      --success: #27ae60;
+      --danger: #e74c3c;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .theme-toggle {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .theme-toggle button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
+
+    .input-section {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .input-section input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--primary);
+      border-radius: 6px;
+    }
+
+    .input-section button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    li {
+      background: var(--card);
+      padding: 10px;
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .actions button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .edit-btn { background: orange; color: white; }
+    .delete-btn { background: var(--danger); color: white; }
+    .complete-btn { background: var(--success); color: white; }
+
+    .success-box {
+      margin-top: 30px;
+      padding: 15px;
+      background: var(--success);
+      color: red;
+      border-radius: 8px;
+    }
+
+    .success-box h2 {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📝 To-Do List</h1>
+
+    <div class="theme-toggle">
+      <button onclick="toggleTheme()">🌙 Toggle Dark/Light</button>
+    </div>
+
+    <div class="input-section">
+      <input type="text" id="taskInput" placeholder="Enter a new task">
+      <button onclick="addTask()">Add</button>
+    </div>
+
+    <ul id="taskList"></ul>
+
+    <div class="success-box">
+      <h2>✅ Completed Tasks</h2>
+      <ul id="completedList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+    const completedList = document.getElementById("completedList");
+
+    function addTask() {
+      const taskText = taskInput.value.trim();
+      if (taskText === "") return alert("Enter a task!");
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span>${taskText}</span>
+        <div class="actions">
+          <button class="edit-btn" onclick="editTask(this)">Edit</button>
+          <button class="complete-btn" onclick="completeTask(this)">Success</button>
+          <button class="delete-btn" onclick="deleteTask(this)">Delete</button>
+        </div>
+      `;
+      taskList.appendChild(li);
+      taskInput.value = "";
+    }
+
+    function editTask(button) {
+      const li = button.parentElement.parentElement;
+      const span = li.querySelector("span");
+      const newText = prompt("Edit your task:", span.textContent.replace(" (edited)", ""));
+      if (newText !== null && newText.trim() !== "") {
+        span.textContent = newText + " (edited)";
+      }
+    }
+
+    function deleteTask(button) {
+      const li = button.parentElement.parentElement;
+      li.remove();
+    }
+
+    function completeTask(button) {
+      const li = button.parentElement.parentElement;
+      li.querySelector(".actions").remove();
+      completedList.appendChild(li);
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+</body>
+</html>
