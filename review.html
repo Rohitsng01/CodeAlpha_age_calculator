@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- This is the most important tag for responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Midterm Review - Rohit Kumar</title>
+    
+    <!-- Google Fonts: Poppins for titles, Lato for body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+/* 1. THE SETUP - Fully Responsive Base */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #e2e8f0; /* Light grey background */
+  display: flex;
+  flex-direction: column;
+  gap: 30px; /* Space between slides */
+  margin: 0;
+  min-height: 100vh;
+  padding: 20px; /* Padding for mobile view */
+  align-items: center;
+}
+
+.slide-container {
+  /* 
+    This is the core of responsiveness:
+    - It's 100% of the body's width (with padding).
+    - It has a max-width of 1280px for large screens.
+    - It looks like a slide, not a webpage.
+  */
+  width: 100%; 
+  max-width: 1280px; 
+  min-height: 400px; /* Minimum height for small content */
+  
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  /* Responsive padding: 5% vertically, 7% horizontally */
+  padding: 5vh 7vw; 
+  position: relative;
+}
+
+/* 1.1 BACKGROUND STYLING (Blue accent bar) */
+
+.slide-container::before {
+  content: '';
+  height: 8px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background-color: #1976D2; /* Accent color */
+  z-index: 2;
+}
+
+/* 2. CONSISTENT TYPOGRAPHY */
+
+.slide-container h1,
+.slide-container h2,
+.slide-container h3 {
+  color: #212121;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  margin: 0 0 15px 0; /* Default bottom margin */
+}
+
+.slide-container p,
+.slide-container li,
+.slide-container .subtitle {
+  color: #333333;
+  font-family: 'Lato', sans-serif;
+  line-height: 1.6;
+}
+
+/* 
+  Responsive Font Sizes:
+  - 'vw' (viewport width) makes text scale with the screen.
+  - 'clamp(min, preferred, max)' stops it from getting too small or too big.
+*/
+
+.slide-container h1 {
+  /* min 36px, preferred 6vw, max 70px */
+  font-size: clamp(2.25rem, 6vw, 4.375rem);
+}
+
+.slide-container .slide-title {
+  /* This is an h2 */
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: #1976D2;
+  margin-bottom: 30px;
+  width: 100%;
+  text-align: left;
+}
+
+.slide-container h3 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: #1976D2;
+  margin-bottom: 15px;
+}
+
+.slide-container p,
+.slide-container li,
+.slide-container .subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+.slide-container .subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: 400;
+  margin: 20px auto;
+  color: #424242;
+}
+
+.slide-container .content-area {
+  align-items: center;
+  display: flex;
+  flex-direction: column; /* Default to column for content */
+  flex-grow: 1;
+  justify-content: center;
+  width: 100%;
+}
+
+/* 3. LAYOUT DEFINITIONS */
+
+.title-layout { text-align: center; }
+.title-layout h1 { color: #1976D2; }
+
+.two-column {
+  display: grid;
+  /* On desktop, 2 columns */
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.image-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid #e0e0e0;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: auto; /* Maintain aspect ratio */
+  display: block;
+  object-fit: contain;
+}
+.image-right-layout .image-wrapper img {
+    object-fit: cover;
+    aspect-ratio: 4/3; /* Force a 4:3 aspect ratio */
+    height: 100%;
+}
+
+/* Styled Bullet Points */
+.bullet-list { width: 100%; }
+.bullet-list ul { list-style: none; margin: 0; padding: 0; }
+.bullet-list li {
+  align-items: flex-start;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+.bullet-list i {
+  color: #1976D2;
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem); /* Responsive icon */
+  flex-shrink: 0;
+  margin-top: 5px;
+  width: 30px;
+  text-align: center;
+}
+.bullet-list li strong { color: #1976D2; font-weight: 700; }
+
+/* Timeline Layout (Vertical for responsiveness) */
+.timeline-layout {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  padding-left: 30px; /* Space for the line */
+  border-left: 4px solid #e0e0e0; /* The timeline */
+}
+.timeline-item {
+  position: relative;
+  padding: 10px 0 30px 20px;
+}
+.timeline-item::after {
+  content: '';
+  background-color: #fff;
+  border-radius: 50%;
+  border: 4px solid #1976D2; /* Dot on the line */
+  height: 16px;
+  left: -42px; /* Position over the border */
+  position: absolute;
+  top: 15px;
+  width: 16px;
+  z-index: 1;
+}
+.timeline-item h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
+.timeline-item p { font-size: clamp(0.9rem, 1.8vw, 1.1rem); margin: 0;}
+
+/* Bar Chart Layout */
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+.bar {
+  display: flex;
+  flex-direction: column; /* Stack label and bar */
+  align-items: flex-start;
+  gap: 5px;
+}
+.bar .label {
+  font-weight: 700;
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+}
+.bar .bar-inner {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  width: 100%;
+  height: 35px;
+}
+.bar .bar-fill {
+  align-items: center;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  font-weight: 700;
+  height: 100%;
+  justify-content: flex-end;
+  padding-right: 15px;
+  background: linear-gradient(90deg, #42a5f5, #1976D2); 
+}
+.chart-summary { font-style: italic; margin-top: 20px; text-align: center; }
+
+/* Q&A Layout */
+.qa-layout { text-align: center; width: 100%; }
+.qa-layout h2 { font-size: clamp(2.5rem, 8vw, 5rem); margin-bottom: 20px; color: #1976D2; }
+.qa-layout p { font-size: clamp(1rem, 2.5vw, 1.5rem); }
+.qa-layout .contact-info {
+  color: #333333;
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+  margin-top: 40px;
+}
+
+
+/* 
+  This Media Query is the KEY to responsiveness.
+  When the screen is 800px or less, it applies these styles.
+*/
+@media (max-width: 800px) {
+  body {
+    padding: 10px; /* Tighter padding on mobile */
+    gap: 20px;
+  }
+  
+  .slide-container {
+    padding: 8vw 6vw; /* More vertical padding on mobile */
+  }
+
+  .slide-title {
+    text-align: center; /* Center title on mobile */
+  }
+
+  .two-column {
+    grid-template-columns: 1fr; /* Stack the columns */
+    gap: 30px;
+  }
+  
+  .two-column h3 {
+    text-align: center; /* Center sub-headers on mobile */
+  }
+}
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title_Slide -->
+<div class="slide-container" id="slide1">
+    <div class="content-area title-layout">
+        <h1>Internship Midterm Review</h1>
+        <p class="subtitle">
+            <strong>Rohit Kumar (CA/SE3/3602)</strong> <br>
+            Web Development Intern at <strong>CodeAlpha</strong> <br>
+            Internship Period: Sept 15 – Dec 15, 2025
+        </p>
+    </div>
+</div>
+
+<!-- Slide 2: Styled_Bullet_Points (Agenda) -->
+<div class="slide-container" id="slide2">
+    <h2 class="slide-title">Midterm Review Agenda</h2>
+    <div class="content-area">
+        <div class="bullet-list">
+            <ul>
+                <li><i class="fa-solid fa-play"></i><strong>CodeAlpha & Domain:</strong> Overview of the company and Web Development domain.</li>
+                <li><i class="fa-solid fa-play"></i><strong>My Role & Timeline:</strong> My responsibilities and current progress.</li>
+                <li><i class="fa-solid fa-play"></i><strong>Task 1: Age Calculator:</strong> Objectives, Tech Stack, and Concepts mastered.</li>
+                <li><i class="fa-solid fa-play"></i><strong>Task 2: To-Do List:</strong> Objectives, Tech Stack, and Concepts mastered.</li>
+                <li><i class="fa-solid fa-play"></i><strong>Key Skills & Learnings:</strong> Both technical and soft skills developed.</li>
+                <li><i class="fa-solid fa-play"></i><strong>Goals for Second Half:</strong> What I plan to achieve next (Dec 15 Goal).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 3: Image_Right_Text_Left (Company Overview) -->
+<div class="slide-container" id="slide3">
+    <h2 class="slide-title">CodeAlpha & Web Development Domain</h2>
+    <div class="content-area">
+        <div class="two-column image-right-layout">
+            <div>
+                <h3>CodeAlpha Mission (Inferred)</h3>
+                <p>A platform focused on providing real-world, hands-on experience and mentorship to enhance practical coding skills.</p>
+                <br>
+                <h3>My Domain: Web Development</h3>
+                <p>Focused on building interactive, functional, and visually appealing user interfaces using core web technologies.</p>
+                <br>
+                <h3>Key Tech Focus</h3>
+                <p><strong>HTML</strong> (Structure), <strong>CSS</strong> (Styling/Layout), <strong>JavaScript</strong> (Logic/Interactivity).</p>
+            </div>
+            <div>
+                <!-- Placeholder Image -->
+                <div class="image-wrapper">
+                    <img src="https://placehold.co/600x400/1976D2/ffffff?text=Web+Development+Focus" alt="Web Development Focus" >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4: Timeline (Project Progress) -->
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title">My Internship Timeline & Progress</h2>
+    <div class="content-area">
+        <div class="timeline-layout">
+            <div class="timeline-item">
+                <h3>Week 1-3 (Sept)</h3>
+                <p>Onboarding, setup, and planning for first task.</p>
+            </div>
+            <div class="timeline-item">
+                <h3>Week 4-6 (Oct)</h3>
+                <p><strong>Completed Task 1: Age Calculator.</strong></p>
+            </div>
+            <div class="timeline-item">
+                <h3>Week 7-9 (Nov)</h3>
+                <p><strong>Completed Task 2: To-Do List App.</strong> (Current Status)</p>
+            </div>
+            <div class="timeline-item">
+                <h3>Week 10-13 (Dec)</h3>
+                <p>Focus on advanced tasks / final project.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: Two Column Text (Task 1: Age Calculator) -->
+<div class="slide-container" id="slide5">
+    <h2 class="slide-title">Task 1: Age Calculator (Completed)</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3>Objective & Features</h3>
+                <p>Created a user interface that accepts a Date of Birth (Day, Month, Year) and accurately calculates the user's age in years, months, and days.</p>
+                <br>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Input Validation</strong> for DOB format.</li>
+                    <li><strong>Precise Calculation</strong> using JavaScript's Date object.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Tech Stack & Concepts</h3>
+                <div class="bullet-list">
+                    <ul>
+                        <li><i class="fa-solid fa-code"></i><strong>Tech Stack:</strong> HTML, CSS, Vanilla JavaScript.</li>
+                        <li><i class="fa-solid fa-circle-check"></i><strong>Concept Mastered 1:</strong> Working with <strong>JavaScript Date & Time</strong> calculations.</li>
+                        <li><i class="fa-solid fa-circle-check"></i><strong>Concept Mastered 2:</strong> <strong>DOM Manipulation</strong> (Reading inputs and displaying outputs).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6: Two Column Text (Task 2: To-Do List App) -->
+<div class="slide-container" id="slide6">
+    <h2 class="slide-title">Task 2: To-Do List App (Completed)</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3>Objective & Features</h3>
+                <p>Built a persistent, interactive application for managing daily tasks, demonstrating full-cycle task management.</p>
+                <br>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>CRUD Operations:</strong> Add, Mark Complete, Edit, and Delete tasks.</li>
+                    <li><strong>Persistence:</strong> Tasks are stored using <strong>browser localStorage</strong>.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Tech Stack & Concepts</h3>
+                <div class="bullet-list">
+                    <ul>
+                        <li><i class="fa-solid fa-code"></i><strong>Tech Stack:</strong> HTML, CSS, Vanilla JavaScript.</li>
+                        <li><i class="fa-solid fa-circle-check"></i><strong>Concept Mastered 1:</strong> Implementing <strong>CRUD Operations</strong> in JavaScript.</li>
+                        <li><i class="fa-solid fa-circle-check"></i><strong>Concept Mastered 2:</strong> Effective <strong>Event Handling</strong> and <strong>LocalStorage</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 7: Bar_Chart_For_Comparisons (Technical Skills) -->
+<div class="slide-container" id="slide7">
+    <h2 class="slide-title">Key Skills Developed So Far</h2>
+    <div class="content-area">
+        <div class="chart-container">
+            <div class="bar">
+                <div class="label">JavaScript DOM Manipulation</div>
+                <div class="bar-inner"><div class="bar-fill" style="width: 85%;">85%</div></div>
+            </div>
+            <div class="bar">
+                <div class="label">Logical Problem Solving</div>
+                <div class="bar-inner"><div class="bar-fill" style="width: 75%;">75%</div></div>
+            </div>
+            <div class="bar">
+                <div class="label">LocalStorage / Persistence</div>
+                <div class="bar-inner"><div class="bar-fill" style="width: 70%;">70%</div></div>
+            </div>
+            <div class="bar">
+                <div class="label">CSS Layout & Styling</div>
+                <div class="bar-inner"><div class="bar-fill" style="width: 60%;">60%</div></div>
+            </div>
+        </div>
+        <p class="chart-summary">The tasks provided strong foundational practice in both JavaScript logic and structuring interactive web applications.</p>
+    </div>
+</div>
+
+<!-- Slide 8: Image_Right_Text_Left (Goals) -->
+<div class="slide-container" id="slide8">
+    <h2 class="slide-title">Goals for the Second Half (Nov 15 - Dec 15)</h2>
+    <div class="content-area">
+        <div class="two-column image-right-layout">
+            <div>
+                <div class="bullet-list">
+                    <ul>
+                        <li><i class="fa-solid fa-rocket"></i><strong>Master Advanced JS:</strong> Focus on asynchronous programming (Promises, Async/Await) or API interaction.</li>
+                        <li><i class="fa-solid fa-book-open"></i><strong>Explore Frameworks:</strong> Begin learning the basics of a framework/library (e.g., React concepts).</li>
+                        <li><i class="fa-solid fa-network-wired"></i><strong>Third Task Completion:</strong> Successfully complete the next assigned task/project with minimal supervision.</li>
+                        <li><i class="fa-solid fa-handshake"></i><strong>Code Polish:</strong> Improve project code quality (readability, comments, variable naming).</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <!-- Placeholder Image -->
+                <div class="image-wrapper">
+                    <img src="https://placehold.co/600x400/1976D2/ffffff?text=Future+Growth+Path" alt="Future Growth Path" >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 9: Q&A -->
+<div class="slide-container" id="slide9">
+    <div class="content-area qa-layout">
+        <h2>Thank You</h2>
+        <p>This concludes my midterm review. I am focused on maximizing the remaining time.</p>
+        <p>Questions?</p>
+        <div class="contact-info">
+            Student ID: CA/SE3/3602
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
