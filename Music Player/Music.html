@@ -1,0 +1,565 @@
+\<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Music Player</title>
+  <style>
+    :root{
+      --bg:#0f0f23; --card:rgba(25,25,45,0.85); --muted:#a8b2d1; --accent:#6366f1; 
+      --accent-light:#818cf8; --accent-dark:#4f46e5; --success:#10b981; --glass: rgba(255,255,255,0.08);
+      --text:#e2e8f0; --text-bright:#f1f5f9; --shadow:rgba(0,0,0,0.3);
+    }
+    [data-theme="dark"]{ --bg:#0a0a16; --card:rgba(20,20,35,0.9); --muted:#8b92b0; --accent:#7c3aed; --accent-light:#a78bfa; --accent-dark:#6d28d9; --success:#059669; --glass: rgba(255,255,255,0.05); }
+    [data-theme="light"]{ --bg:#f8f9fc; --card:rgba(255,255,255,0.95); --muted:#64748b; --accent:#6366f1; --accent-light:#818cf8; --accent-dark:#4f46e5; --success:#10b981; --glass:rgba(255,255,255,0.7); --text:#1e293b; --text-bright:#0f172a; --shadow:rgba(0,0,0,0.1); }
+
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{font-family:'Segoe UI', Inter, system-ui, -apple-system, sans-serif; margin:0; 
+      background:linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
+      min-height:100vh; color:var(--text); overflow-x:hidden;
+      background-attachment: fixed;
+    }
+    [data-theme="light"] body{background:linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);}
+    [data-theme="light"] body{background:linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);}
+    
+    .app{max-width:1200px;margin:32px auto;padding:20px;display:grid;grid-template-columns:340px 1fr;gap:24px; transition:all 0.3s ease;}
+    .card{background:var(--card);border-radius:20px;padding:24px;box-shadow:0 20px 60px var(--shadow);
+      backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.1); transition:all 0.3s ease;}
+    .card:hover{box-shadow:0 25px 70px var(--shadow); transform:translateY(-2px);}
+
+    /* Sidebar */
+    .sidebar{display:flex;flex-direction:column;gap:16px}
+    .logo{display:flex;align-items:center;gap:12px; margin-bottom:8px;}
+    .logo .dot{width:52px;height:52px;border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),var(--success));
+      display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800; font-size:20px;
+      box-shadow:0 8px 24px rgba(99,102,241,0.4); transition:transform 0.3s ease;}
+    .logo .dot:hover{transform:scale(1.05) rotate(5deg);}
+    h1{font-size:20px;margin:0;color:var(--text-bright); font-weight:700;}
+
+    h1{font-size:20px;margin:0;color:var(--text-bright); font-weight:700;}
+
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+    input[type=file]{display:none}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;
+      background:var(--glass);cursor:pointer;border:1px solid rgba(255,255,255,0.15);color:var(--text);
+      font-weight:500; transition:all 0.3s ease; font-size:14px;}
+    .btn:hover{background:rgba(255,255,255,0.15); border-color:var(--accent-light); transform:translateY(-2px);
+      box-shadow:0 8px 20px rgba(0,0,0,0.2);}
+    .btn:active{transform:translateY(0px); box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+
+    .playlists{margin-top:12px;display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;padding-right:8px;}
+    .playlists::-webkit-scrollbar{width:6px;}
+    .playlists::-webkit-scrollbar-thumb{background:var(--accent); border-radius:10px;}
+    .playlists::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);}
+    .playlist-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:12px;
+      cursor:pointer; transition:all 0.3s ease; border:1px solid transparent;}
+    .playlist-item:hover{background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.1); transform:translateX(4px);}
+    .playlist-item.active{background:linear-gradient(90deg,rgba(99,102,241,0.25),rgba(16,185,129,0.15));
+      color:var(--accent-light); border-color:var(--accent); font-weight:600;}
+
+    .playlist-item.active{background:linear-gradient(90deg,rgba(99,102,241,0.25),rgba(16,185,129,0.15));
+      color:var(--accent-light); border-color:var(--accent); font-weight:600;}
+
+    .main{display:flex;flex-direction:column;gap:20px}
+    .now{display:flex;align-items:center;gap:20px; padding:12px; background:rgba(255,255,255,0.03); border-radius:16px;}
+    .art{width:110px;height:110px;border-radius:16px;
+      background:linear-gradient(135deg,var(--accent),var(--success));
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff; font-size:32px;
+      box-shadow:0 12px 32px rgba(99,102,241,0.4); transition:all 0.4s ease;}
+    .art:hover{transform:scale(1.05) rotate(-2deg); box-shadow:0 16px 40px rgba(99,102,241,0.5);}
+    .meta{flex:1}
+    .meta h2{margin:0;color:var(--text-bright);font-size:22px; font-weight:700; margin-bottom:6px;}
+    .meta p{margin:0;color:var(--muted);font-size:15px; font-weight:500;}
+
+    .player-controls{display:flex;align-items:center;gap:14px;margin-top:14px}
+    .bigbtn{width:56px;height:56px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;cursor:pointer;
+      font-size:20px; box-shadow:0 8px 24px rgba(99,102,241,0.5); transition:all 0.3s ease;}
+    .bigbtn:hover{transform:scale(1.1); box-shadow:0 12px 32px rgba(99,102,241,0.6);}
+    .bigbtn:active{transform:scale(0.95);}
+
+    .bigbtn:hover{transform:scale(1.1); box-shadow:0 12px 32px rgba(99,102,241,0.6);}
+    .bigbtn:active{transform:scale(0.95);}
+
+    .progress{display:flex;align-items:center;gap:12px}
+    .progress input[type=range]{flex:1}
+    input[type=range]{-webkit-appearance:none; appearance:none; height:6px; border-radius:10px;
+      background:rgba(255,255,255,0.1); outline:none; transition:all 0.2s ease;}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:18px; height:18px;
+      border-radius:50%; background:linear-gradient(135deg,var(--accent-light),var(--accent));
+      cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,0.5); transition:all 0.2s ease;}
+    input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2); box-shadow:0 6px 16px rgba(99,102,241,0.7);}
+    input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent-light),var(--accent)); cursor:pointer;
+      border:none; box-shadow:0 4px 12px rgba(99,102,241,0.5);}
+    .vol{display:flex;align-items:center;gap:10px}
+
+    .library{display:grid;grid-template-columns:1fr 1fr;gap:14px; margin-top:8px;}
+    .track{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;cursor:pointer;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+      transition:all 0.3s ease;}
+    .track:hover{background:rgba(255,255,255,0.1); border-color:var(--accent); transform:translateX(4px);
+      box-shadow:0 8px 20px rgba(0,0,0,0.2);}
+    .track .title{font-weight:600;color:var(--text-bright); font-size:15px;}
+    .tags{font-size:13px;color:var(--muted); margin-top:4px;}
+
+    .track .title{font-weight:600;color:var(--text-bright); font-size:15px;}
+    .tags{font-size:13px;color:var(--muted); margin-top:4px;}
+
+    .searchbar{display:flex;gap:10px;align-items:center}
+    .searchbar input, .stream-input{flex:1;padding:12px 16px;border-radius:12px;
+      border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08);
+      color:var(--text); font-size:14px; transition:all 0.3s ease; outline:none;}
+    .searchbar input:focus, .stream-input:focus{border-color:var(--accent); background:rgba(255,255,255,0.12);
+      box-shadow:0 0 0 3px rgba(99,102,241,0.2);}
+    .searchbar input::placeholder, .stream-input::placeholder{color:var(--muted); opacity:0.7;}
+
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:13px;
+      padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);}
+
+    @media (max-width:900px){.app{grid-template-columns:1fr;}.sidebar{order:2}}
+    
+    /* Additional modern touches */
+    strong{color:var(--text-bright); font-weight:600;}
+    #trackCount{color:var(--accent-light); font-weight:700;}
+  </style>
+</head>
+<body data-theme="light">
+  <div class="app">
+    <aside class="card sidebar">
+      <div class="logo">
+        <div class="dot">🎵</div>
+        <div>
+          <h1>Music Player</h1>
+          <div style="font-size:13px;color:var(--muted); font-weight:500;">Local playlists • no backend</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label class="btn" for="file-input">📁 Upload Folder / Files</label>
+        <input id="file-input" type="file" accept="audio/*" multiple webkitdirectory directory />
+
+        <button id="streamBtn" class="btn">🔗 Stream URL</button>
+        <button id="newPl" class="btn">＋ New Playlist</button>
+        <button id="toggleTheme" class="btn">🌓 Theme</button>
+      </div>
+
+      <div style="margin-top:8px">
+        <strong style="color:var(--muted)">Playlists</strong>
+        <div class="playlists" id="playlists"></div>
+      </div>
+
+      <div style="margin-top:8px">
+        <strong style="color:var(--muted)">Filters</strong>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="filterGenre" placeholder="🎸 Genre" style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:var(--text);outline:none;transition:all 0.3s ease;" />
+          <input id="filterArtist" placeholder="🎤 Artist" style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:var(--text);outline:none;transition:all 0.3s ease;" />
+        </div>
+      </div>
+    </aside>
+
+    <main class="main card">
+      <div class="now">
+        <div class="art" id="cover">♪</div>
+        <div class="meta">
+          <h2 id="nowTitle">Nothing playing</h2>
+          <p id="nowArtist">—</p>
+
+          <div class="player-controls">
+            <button id="prev" class="btn">⏮️</button>
+            <button id="play" class="bigbtn">▶️</button>
+            <button id="next" class="btn">⏭️</button>
+
+            <div style="flex:1"></div>
+
+            <div class="vol">
+              <span style="font-size:18px;">🔊</span>
+              <input id="volume" type="range" min="0" max="1" step="0.01" value="1" style="width:110px" />
+              <span id="volLabel" style="font-weight:600;">100%</span>
+            </div>
+          </div>
+
+          <div class="progress" style="margin-top:10px">
+            <span id="timeCur" style="font-weight:600; min-width:42px;">0:00</span>
+            <input id="seek" type="range" min="0" max="100" value="0" />
+            <span id="timeDur" style="font-weight:600; min-width:42px;">0:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="searchbar" style="width:60%">
+          <span style="font-size:18px;">🔍</span>
+          <input id="search" placeholder="Search by title / artist / genre" />
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="stream-input" class="stream-input" placeholder="🔗 Paste audio URL and press Stream" />
+          <button id="streamPlay" class="btn">Stream</button>
+        </div>
+      </div>
+
+      <div class="library" id="library"></div>
+
+      <footer>
+        <div>🎵 Tracks: <span id="trackCount">0</span></div>
+        <div>💾 Saved in localStorage</div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Hidden audio element -->
+  <audio id="audio"></audio>
+
+  <script>
+    // Basic state
+    const state = {
+      tracks: [], // {id, title, artist, genre, src, fileName, objectURL}
+      playlists: {}, // {name: [trackIds]}
+      currentList: 'All Tracks',
+      currentIndex: -1,
+      playing: false
+    }
+
+    // DOM
+    const audio = document.getElementById('audio')
+    const fileInput = document.getElementById('file-input')
+    const library = document.getElementById('library')
+    const playBtn = document.getElementById('play')
+    const prevBtn = document.getElementById('prev')
+    const nextBtn = document.getElementById('next')
+    const nowTitle = document.getElementById('nowTitle')
+    const nowArtist = document.getElementById('nowArtist')
+    const cover = document.getElementById('cover')
+    const seek = document.getElementById('seek')
+    const timeCur = document.getElementById('timeCur')
+    const timeDur = document.getElementById('timeDur')
+    const volume = document.getElementById('volume')
+    const volLabel = document.getElementById('volLabel')
+    const playlistsEl = document.getElementById('playlists')
+    const newPlBtn = document.getElementById('newPl')
+    const search = document.getElementById('search')
+    const trackCount = document.getElementById('trackCount')
+    const toggleTheme = document.getElementById('toggleTheme')
+    const filterGenre = document.getElementById('filterGenre')
+    const filterArtist = document.getElementById('filterArtist')
+    const streamBtn = document.getElementById('streamBtn')
+    const streamInput = document.getElementById('stream-input')
+    const streamPlay = document.getElementById('streamPlay')
+
+    // Utils
+    const uid = ()=> Date.now().toString(36) + Math.random().toString(36).slice(2,8)
+
+    // Persistence
+    function loadState(){
+      try{
+        const raw = localStorage.getItem('webplayer:state')
+        if(raw){
+          const parsed = JSON.parse(raw)
+          state.playlists = parsed.playlists || {}
+          state.tracks = parsed.tracks || []
+        }
+      }catch(e){console.warn('load error', e)}
+    }
+    function saveState(){
+      // we should not persist objectURLs; remove them
+      const safeTracks = state.tracks.map(t => ({...t, objectURL: undefined}))
+      localStorage.setItem('webplayer:state', JSON.stringify({tracks: safeTracks, playlists: state.playlists}))
+    }
+
+    // render playlists
+    function renderPlaylists(){
+      playlistsEl.innerHTML = ''
+      const allBtn = document.createElement('div')
+      allBtn.className = 'playlist-item' + (state.currentList==='All Tracks' ? ' active':'')
+      allBtn.textContent = 'All Tracks'
+      allBtn.onclick = ()=>{state.currentList='All Tracks'; renderPlaylists(); renderLibrary();}
+      playlistsEl.appendChild(allBtn)
+
+      for(const name of Object.keys(state.playlists)){
+        const el = document.createElement('div')
+        el.className = 'playlist-item' + (state.currentList===name ? ' active':'')
+        el.innerHTML = `<span>${name}</span><span style="display:flex;gap:6px"><button data-name="${name}" class="btn small" style="padding:6px 10px;">▶️</button><button data-remove="${name}" class="btn" style="padding:6px 10px;">🗑️</button></span>`
+        el.onclick = ()=>{state.currentList=name; renderPlaylists(); renderLibrary()}
+        playlistsEl.appendChild(el)
+      }
+
+      // attach handlers for play and delete inside the playlist item
+      playlistsEl.querySelectorAll('button[data-name]').forEach(b=>b.addEventListener('click', (ev)=>{
+        ev.stopPropagation()
+        const name = b.getAttribute('data-name')
+        playPlaylist(name)
+      }))
+      playlistsEl.querySelectorAll('button[data-remove]').forEach(b=>b.addEventListener('click', (ev)=>{
+        ev.stopPropagation()
+        const name = b.getAttribute('data-remove')
+        if(confirm('Delete playlist '+name+'?')){ delete state.playlists[name]; saveState(); renderPlaylists(); renderLibrary() }
+      }))
+    }
+
+    function playPlaylist(name){
+      const ids = state.playlists[name] || []
+      if(ids.length===0) return alert('Playlist is empty')
+      // find first available index in state.tracks
+      const idx = state.tracks.findIndex(t=>t.id===ids[0])
+      if(idx>=0){ playIndex(idx) ; state.currentList = name; renderPlaylists(); renderLibrary() }
+    }
+
+    // render library with filters
+    function renderLibrary(){
+      const query = (search.value || '').toLowerCase()
+      const genreF = (filterGenre.value || '').toLowerCase()
+      const artistF = (filterArtist.value || '').toLowerCase()
+
+      let list = state.tracks.slice()
+      if(state.currentList!=='All Tracks'){
+        const ids = new Set(state.playlists[state.currentList] || [])
+        list = list.filter(t=>ids.has(t.id))
+      }
+
+      list = list.filter(t=>{
+        if(query){
+          const hay = (t.title+' '+(t.artist||'')+' '+(t.genre||'')).toLowerCase()
+          if(!hay.includes(query)) return false
+        }
+        if(genreF && !(t.genre||'').toLowerCase().includes(genreF)) return false
+        if(artistF && !(t.artist||'').toLowerCase().includes(artistF)) return false
+        return true
+      })
+
+      library.innerHTML = ''
+      for(const t of list){
+        const div = document.createElement('div')
+        div.className = 'track'
+        div.innerHTML = `<div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--success));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.3);">♪</div>
+          <div style="flex:1">
+            <div class="title">${escapeHtml(t.title||t.fileName)}</div>
+            <div class="tags">${escapeHtml(t.artist||'—')} • ${escapeHtml(t.genre||'—')}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn" data-id="${t.id}" style="padding:8px 12px;">▶️</button>
+            <button class="btn edit" data-edit="${t.id}" style="padding:8px 12px;">✏️</button>
+            <button class="btn addpl" data-add="${t.id}" style="padding:8px 12px;">➕</button>
+          </div>`
+
+        // click anywhere to play
+        div.addEventListener('click', (ev)=>{
+          if(ev.target && ev.target.tagName==='BUTTON') return
+          const idx = state.tracks.findIndex(x=>x.id===t.id)
+          if(idx>=0) playIndex(idx)
+        })
+
+        library.appendChild(div)
+      }
+
+      // attach small buttons
+      library.querySelectorAll('button[data-id]').forEach(b=>b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-id')
+        const idx = state.tracks.findIndex(x=>x.id===id)
+        if(idx>=0) playIndex(idx)
+      }))
+      library.querySelectorAll('button[data-edit]').forEach(b=>b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-edit')
+        openEditDialog(id)
+      }))
+      library.querySelectorAll('button[data-add]').forEach(b=>b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-add')
+        addToPlaylistPrompt(id)
+      }))
+
+      trackCount.textContent = list.length
+    }
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]) }
+
+    function openEditDialog(id){
+      const t = state.tracks.find(x=>x.id===id)
+      if(!t) return
+      const title = prompt('Title', t.title || t.fileName)
+      if(title===null) return
+      const artist = prompt('Artist', t.artist||'')
+      if(artist===null) return
+      const genre = prompt('Genre', t.genre||'')
+      if(genre===null) return
+      t.title = title; t.artist = artist; t.genre = genre
+      saveState(); renderLibrary()
+    }
+
+    function addToPlaylistPrompt(trackId){
+      const name = prompt('Add to playlist (enter name). Existing playlists will be used or a new one created. Example: Chill')
+      if(!name) return
+      if(!state.playlists[name]) state.playlists[name]=[]
+      if(!state.playlists[name].includes(trackId)) state.playlists[name].push(trackId)
+      saveState(); renderPlaylists()
+      alert('Added to '+name)
+    }
+
+    // Play controls
+    function playIndex(i){
+      if(i<0 || i>=state.tracks.length) return
+      const t = state.tracks[i]
+      state.currentIndex = i
+      // ensure objectURL exists - recreate if needed
+      if(!t.objectURL && t.fileName && !t.src.startsWith('blob:')){
+        // can't reconstruct objectURL for stored files; leave src as-is if stream url
+      }
+      audio.src = t.objectURL || t.src
+      audio.play()
+      state.playing = true
+      updateNowPlaying()
+    }
+
+    function updateNowPlaying(){
+      const t = state.tracks[state.currentIndex]
+      if(t){
+        nowTitle.textContent = t.title || t.fileName || 'Unknown'
+        nowArtist.textContent = t.artist || '—'
+        cover.textContent = (t.title||t.fileName||'🎵').slice(0,2).toUpperCase()
+      } else {
+        nowTitle.textContent = 'Nothing playing'
+        nowArtist.textContent = '—'
+        cover.textContent = '♪'
+      }
+      playBtn.textContent = state.playing ? '⏸️' : '▶️'
+      renderLibrary()
+      renderPlaylists()
+    }
+
+    playBtn.addEventListener('click', ()=>{
+      if(state.playing){ audio.pause(); state.playing=false }
+      else { audio.play(); state.playing=true }
+      updateNowPlaying()
+    })
+
+    prevBtn.addEventListener('click', ()=>{
+      if(state.currentIndex>0) playIndex(state.currentIndex-1)
+    })
+    nextBtn.addEventListener('click', ()=>{
+      if(state.currentIndex<state.tracks.length-1) playIndex(state.currentIndex+1)
+    })
+
+    audio.addEventListener('play', ()=>{ state.playing=true; updateNowPlaying() })
+    audio.addEventListener('pause', ()=>{ state.playing=false; updateNowPlaying() })
+
+    audio.addEventListener('timeupdate', ()=>{
+      if(isFinite(audio.duration)){
+        const pct = (audio.currentTime / audio.duration) * 100
+        seek.value = pct
+        timeCur.textContent = formatTime(audio.currentTime)
+        timeDur.textContent = formatTime(audio.duration)
+      }
+    })
+    seek.addEventListener('input', ()=>{
+      if(isFinite(audio.duration)) audio.currentTime = (seek.value/100) * audio.duration
+    })
+
+    audio.addEventListener('ended', ()=>{ // auto-next
+      if(state.currentIndex < state.tracks.length-1) playIndex(state.currentIndex+1)
+      else { state.playing=false; updateNowPlaying() }
+    })
+
+    function formatTime(sec){
+      if(!isFinite(sec)) return '0:00'
+      const s = Math.floor(sec%60).toString().padStart(2,'0')
+      const m = Math.floor(sec/60)
+      return m+':'+s
+    }
+
+    volume.addEventListener('input', ()=>{ audio.volume = parseFloat(volume.value); volLabel.textContent = Math.round(audio.volume*100)+'%' })
+
+    // File handling (supports folder upload via webkitdirectory)
+    fileInput.addEventListener('change', (ev)=>{
+      let files = Array.from(ev.target.files || [])
+      if(files.length===0) return
+
+      // If directory upload, browsers provide `webkitRelativePath` to preserve folder order.
+      // Sort by relative path (or filename) so folder order is maintained when adding to playlist.
+      files.sort((a,b)=>{
+        const pa = (a.webkitRelativePath || a.name).toString().toLowerCase()
+        const pb = (b.webkitRelativePath || b.name).toString().toLowerCase()
+        return pa.localeCompare(pb)
+      })
+
+      for(const f of files){
+        const id = uid()
+        const objectURL = URL.createObjectURL(f)
+        const fileName = f.webkitRelativePath || f.name
+        const title = fileName.replace(/\.[^/.]+$/, "").split('/').pop()
+        const item = { id, title, artist:'', genre:'', src:objectURL, fileName, objectURL }
+        state.tracks.push(item)
+      }
+      saveState(); renderLibrary(); renderPlaylists()
+      // clear input so same folder can be re-selected later
+      try{ fileInput.value = '' }catch(e){}
+    })
+
+    // Stream
+    streamPlay.addEventListener('click', ()=>{
+      const url = streamInput.value.trim()
+      if(!url) return alert('Enter an audio URL')
+      const id = uid();
+      const title = url.split('/').pop().split('?')[0] || 'Stream'
+      const item = {id, title, artist:'', genre:'', src:url, fileName:title}
+      state.tracks.push(item)
+      saveState(); renderLibrary(); streamInput.value=''
+      const idx = state.tracks.findIndex(t=>t.id===id)
+      playIndex(idx)
+    })
+
+    streamBtn.addEventListener('click', ()=>{
+      const u = prompt('Enter direct audio URL to stream (mp3,ogg, etc)')
+      if(u) { streamInput.value = u }
+    })
+
+    // New playlist
+    newPlBtn.addEventListener('click', ()=>{
+      const name = prompt('Playlist name')
+      if(!name) return
+      if(state.playlists[name]) return alert('Already exists')
+      state.playlists[name]=[]
+      saveState(); renderPlaylists()
+    })
+
+    // Search & filters
+    search.addEventListener('input', ()=>renderLibrary())
+    filterGenre.addEventListener('input', ()=>renderLibrary())
+    filterArtist.addEventListener('input', ()=>renderLibrary())
+
+    // Theme toggle
+    toggleTheme.addEventListener('click', ()=>{
+      const el = document.body
+      const cur = el.getAttribute('data-theme')
+      el.setAttribute('data-theme', cur==='light' ? 'dark' : 'light')
+    })
+
+    // Add action to create playlists from selection (contextual add)
+    function addToCurrentPlaylist(trackId){
+      if(state.currentList==='All Tracks') return alert('Switch to a playlist and press + to add or use Add to Playlist button')
+      if(!state.playlists[state.currentList]) state.playlists[state.currentList]=[]
+      if(!state.playlists[state.currentList].includes(trackId)) state.playlists[state.currentList].push(trackId)
+      saveState(); renderPlaylists(); alert('Added to '+state.currentList)
+    }
+
+    // Load saved state on start
+    loadState()
+
+    // After load: some saved tracks might be streams (ok) or object URLs (not preserved between sessions). We'll keep src for stream URLs only.
+    // So, objectURLs from previous session are lost — user can re-upload. We'll keep fileName and metadata.
+
+    // Render once
+    renderPlaylists(); renderLibrary(); updateNowPlaying()
+
+    // simple keyboard shortcuts
+    window.addEventListener('keydown', (e)=>{
+      if(e.code==='Space') { e.preventDefault(); playBtn.click() }
+      if(e.code==='ArrowRight') nextBtn.click()
+      if(e.code==='ArrowLeft') prevBtn.click()
+    })
+
+    // Save periodically and before unload
+    setInterval(saveState, 2000)
+    window.addEventListener('beforeunload', saveState)
+  </script>
+</body>
+</html>
